@@ -290,17 +290,56 @@ input[type=file]{display:none}
   </div>
 </div>
 
+
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
+// ── Firebase ──────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyBQr4gPQI1lJAEXZcLthAoScMMQ924IowI",
+  authDomain: "sharebeer-peter.firebaseapp.com",
+  projectId: "sharebeer-peter",
+  storageBucket: "sharebeer-peter.firebasestorage.app",
+  messagingSenderId: "440146434996",
+  appId: "1:440146434996:web:3ea065127cfb3c603d30e1"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 const USERS={marius:'Marius',peter:'Peter'};
 let currentUser=null,currentListUser=null,selectedRating=0,pendingImageB64=null,editingId=null;
+let beersCache=[];
+let unsubscribeSync=null;
 const DAYS=['\u00f8ndag','mandag','tirsdag','onsdag','torsdag','fredag','l\u00f8rdag'];
 const MONTHS=['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
 const MONTHS_LONG=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
 
-function loadBeers(){return JSON.parse(localStorage.getItem('sharebeer_beers')||'[]')}
-function saveBeers(b){localStorage.setItem('sharebeer_beers',JSON.stringify(b))}
+function startSync(){
+  if(unsubscribeSync)unsubscribeSync();
+  unsubscribeSync=db.collection('beers').orderBy('ts').onSnapshot(function(snap){
+    beersCache=[];
+    snap.forEach(function(doc){beersCache.push(doc.data())});
+    refreshHome();
+    if(document.getElementById('listScreen').classList.contains('active'))renderList();
+    if(document.getElementById('searchScreen').classList.contains('active'))doSearch();
+  },function(err){console.error('Sync error:',err)});
+}
+function loadBeers(){return beersCache}
 function pad(n){return String(n).padStart(2,'0')}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function compressImage(dataUrl,cb){
+  var img=new Image();
+  img.onload=function(){
+    var max=900,w=img.width,h=img.height;
+    if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max}else{w=Math.round(w*max/h);h=max}}
+    var c=document.createElement('canvas');
+    c.width=w;c.height=h;
+    c.getContext('2d').drawImage(img,0,0,w,h);
+    cb(c.toDataURL('image/jpeg',0.65));
+  };
+  img.src=dataUrl;
+}
 
 /* ── Session ── */
 function saveSession(user){localStorage.setItem('sharebeer_session',user||'')}
@@ -356,7 +395,7 @@ function doLogin(){
     document.getElementById('pwInput').value='';
     document.getElementById('homeUser').textContent=currentUser;
     if(document.getElementById('stayToggle').checked){saveSession(pw)}else{saveSession('')}
-    refreshHome();
+    startSync();refreshHome();
     document.getElementById('loginScreen').classList.remove('active');
     setHome();
   }else{
@@ -364,7 +403,7 @@ function doLogin(){
     document.getElementById('pwInput').value='';
   }
 }
-function doLogout(){
+function doLogout(){if(unsubscribeSync){unsubscribeSync();unsubscribeSync=null;}beersCache=[];
   currentUser=null;
   saveSession('');
   ['homeScreen','listScreen','addScreen'].forEach(function(s){
@@ -443,8 +482,9 @@ document.getElementById('modalBackdrop').addEventListener('click',function(e){if
 
 function deleteBeer(id){
   if(!confirm('Vil du slette dette \u00f8let?'))return;
-  saveBeers(loadBeers().filter(function(b){return b.id!==id}));
-  closeModal();renderList();
+  db.collection('beers').doc(id).delete().then(function(){
+    closeModal();
+  }).catch(function(e){alert('Feil ved sletting: '+e.message)});
 }
 
 /* ── Add / Edit ── */
@@ -566,10 +606,12 @@ function handleFileInput(input){
   var file=input.files&&input.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(e){
-    pendingImageB64=e.target.result;
-    var p=document.getElementById('imgPreview');
-    p.src=pendingImageB64;p.classList.add('visible');
-    document.getElementById('imgRemove').classList.add('visible');
+    compressImage(e.target.result,function(compressed){
+      pendingImageB64=compressed;
+      var p=document.getElementById('imgPreview');
+      p.src=compressed;p.classList.add('visible');
+      document.getElementById('imgRemove').classList.add('visible');
+    });
   };
   reader.readAsDataURL(file);input.value='';
 }
@@ -587,29 +629,36 @@ function saveBeer(){
   var name=document.getElementById('f_name').value.trim();
   var brewery=document.getElementById('f_brewery').value.trim();
   if(!name||!brewery){alert('Navn og bryggeri er p\u00e5krevd.');return}
-  var beers=loadBeers();
-  if(editingId){
-    for(var i=0;i<beers.length;i++){
-      if(beers[i].id===editingId){
-        beers[i].name=name;beers[i].brewery=brewery;
-        beers[i].style=getSelectedStyle();
-        beers[i].abv=document.getElementById('f_abv').value||'';
-        beers[i].rating=selectedRating;
-        beers[i].notes=document.getElementById('f_notes').value.trim();
-        beers[i].image=pendingImageB64||null;
-        break;
-      }
+  var beerData={
+    name:name,brewery:brewery,
+    style:getSelectedStyle(),
+    abv:document.getElementById('f_abv').value||'',
+    rating:selectedRating,
+    notes:document.getElementById('f_notes').value.trim(),
+    ts:editingId?loadBeers().filter(function(b){return b.id===editingId})[0].ts:Date.now()
+  };
+  function doSave(imageData){
+    beerData.image=imageData||null;
+    if(editingId){
+      beerData.id=editingId;
+      beerData.user=loadBeers().filter(function(b){return b.id===editingId})[0].user;
+      db.collection('beers').doc(editingId).set(beerData).then(function(){
+        currentListUser=beerData.user;
+        document.getElementById('listTitle').textContent=beerData.user+'s \u00f8l';
+        renderList();showOverlay('listScreen');
+      }).catch(function(e){alert('Feil: '+e.message)});
+    }else{
+      beerData.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+      beerData.user=currentUser;
+      db.collection('beers').doc(beerData.id).set(beerData).then(function(){
+        goHome();
+      }).catch(function(e){alert('Feil: '+e.message)});
     }
-    saveBeers(beers);
-    var savedUser=null;
-    for(var j=0;j<beers.length;j++){if(beers[j].id===editingId){savedUser=beers[j].user;break}}
-    currentListUser=savedUser;
-    document.getElementById('listTitle').textContent=savedUser+'s \u00f8l';
-    renderList();showOverlay('listScreen');
+  }
+  if(pendingImageB64&&pendingImageB64.length>200000){
+    compressImage(pendingImageB64,doSave);
   }else{
-    var beer={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),user:currentUser,name:name,brewery:brewery,style:getSelectedStyle(),abv:document.getElementById('f_abv').value||'',rating:selectedRating,notes:document.getElementById('f_notes').value.trim(),image:pendingImageB64||null,ts:Date.now()};
-    beers.push(beer);saveBeers(beers);
-    goHome();
+    doSave(pendingImageB64);
   }
 }
 </script>
