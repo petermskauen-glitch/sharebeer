@@ -393,7 +393,7 @@ document.getElementById('pwInput').addEventListener('keydown',function(e){if(e.k
     currentUser=USERS[saved];
     document.getElementById('homeUser').textContent=currentUser;
     document.getElementById('stayToggle').checked=true;
-    refreshHome();
+    startSync();refreshHome();
     setHome();
   }
 })();
