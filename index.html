@@ -247,6 +247,7 @@ input[type=file]{display:none}
         <img id="imgPreview" class="img-preview" alt="">
         <button class="img-remove" id="imgRemove" onclick="removeImage()" type="button">Fjern bilde</button>
       </div>
+      <div class="field"><label>Kjøpt på</label><input type="text" id="f_purchased" placeholder="f.eks. Vinmonopolet, Meny…"></div>
       <div class="field"><label>Notater</label><textarea id="f_notes" placeholder="Smak, aroma, inntrykk…"></textarea></div>
       <button class="btn-save" onclick="saveBeer()"><span id="saveLabel">Lagre øl 🍺</span></button>
     </div>
@@ -477,6 +478,7 @@ function openModal(id){
   if(b.rating)meta+='<span class="modal-stars">'+stars+'</span>';
   if(b.style)meta+='<span class="modal-tag">'+esc(b.style)+'</span>';
   if(b.abv)meta+='<span class="modal-tag">'+esc(b.abv)+'%</span>';
+  if(b.purchased)meta+='<span class="modal-tag">🛒 '+esc(b.purchased)+'</span>';
   document.getElementById('modalMeta').innerHTML=meta;
   var notesEl=document.getElementById('modalNotes');
   if(b.notes){notesEl.textContent=b.notes;notesEl.style.display='block'}else{notesEl.style.display='none'}
@@ -542,7 +544,7 @@ function doSearch(){
 }
 function showAdd(){
   editingId=null;selectedRating=0;pendingImageB64=null;
-  ['f_name','f_abv','f_notes'].forEach(function(id){document.getElementById(id).value=''});
+  ['f_name','f_abv','f_purchased','f_notes'].forEach(function(id){document.getElementById(id).value=''});
   document.getElementById('f_style_other').value='';
   document.getElementById('f_style_other').style.display='none';
   document.querySelectorAll('input[name="beerStyle"]').forEach(function(r){r.checked=false});
@@ -581,6 +583,7 @@ function showEdit(id){
   document.getElementById('f_abv').disabled=false;
   document.getElementById('f_abv').style.opacity='1';
   document.getElementById('f_abv').value=b.abv||'';
+  document.getElementById('f_purchased').value=b.purchased||'';
   document.getElementById('f_notes').value=b.notes||'';
   document.querySelectorAll('.rating-btn').forEach(function(btn){
     btn.classList.toggle('selected',parseInt(btn.dataset.r)===selectedRating);
@@ -644,6 +647,7 @@ function saveBeer(){
     style:getSelectedStyle(),
     abv:document.getElementById('f_abv').value||'',
     rating:selectedRating,
+    purchased:document.getElementById('f_purchased').value.trim(),
     notes:document.getElementById('f_notes').value.trim(),
     ts:editingId?loadBeers().filter(function(b){return b.id===editingId})[0].ts:Date.now()
   };
