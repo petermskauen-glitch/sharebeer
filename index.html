@@ -544,7 +544,7 @@ function doSearch(){
 }
 function showAdd(){
   editingId=null;selectedRating=0;pendingImageB64=null;
-  ['f_name','f_abv','f_purchased','f_notes'].forEach(function(id){document.getElementById(id).value=''});
+  ['f_name','f_brewery','f_abv','f_purchased','f_notes'].forEach(function(id){document.getElementById(id).value=''});
   document.getElementById('f_style_other').value='';
   document.getElementById('f_style_other').style.display='none';
   document.querySelectorAll('input[name="beerStyle"]').forEach(function(r){r.checked=false});
