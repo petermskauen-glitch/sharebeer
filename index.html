@@ -189,6 +189,10 @@ input[type=file]{display:none}
       </div>
     </div>
   </div>
+  <div class="home-right">
+    <div class="home-collage" id="homeCollage"></div>
+    <div class="home-toplist glass" id="homeToplist"></div>
+  </div>
 </div>
 
 <!-- LIST -->
@@ -425,10 +429,52 @@ function doLogout(){if(unsubscribeSync){unsubscribeSync();unsubscribeSync=null;}
 
 /* ── Home ── */
 function refreshHome(){
+  renderHomeExtras();
   var beers=loadBeers(),el=document.getElementById('newestInfo');
   if(!beers.length){el.textContent='Ingen \u00f8l lagt til enn\u00e5';return}
   var b=beers[beers.length-1],d=new Date(b.ts);
   el.innerHTML='<strong>'+esc(b.user)+'</strong> \u00b7 '+esc(b.name)+'<br>'+DAYS[d.getDay()]+' '+d.getDate()+'. '+MONTHS[d.getMonth()]+' '+d.getFullYear()+' kl. '+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+function renderHomeExtras(){
+  var beers=loadBeers();
+  // Bildevegg: de nyeste \u00f8lene med bilde
+  var withImg=beers.filter(function(b){return b.image}).reverse();
+  var cEl=document.getElementById('homeCollage');
+  if(cEl){
+    if(!withImg.length){
+      cEl.innerHTML='<div class="collage-empty">Ingen bilder enn\u00e5</div>';
+    }else{
+      var n=Math.min(withImg.length,12),ch='<div class="collage-grid">';
+      for(var i=0;i<n;i++){
+        ch+='<div class="collage-tile" data-id="'+withImg[i].id+'"><img src="'+withImg[i].image+'" alt=""></div>';
+      }
+      ch+='</div>';
+      cEl.innerHTML=ch;
+      cEl.querySelectorAll('.collage-tile').forEach(function(t){
+        t.addEventListener('click',function(){openModal(this.dataset.id)});
+      });
+    }
+  }
+  // Toppliste: de h\u00f8yest vurderte \u00f8lene
+  var rated=beers.filter(function(b){return b.rating>0}).sort(function(a,b){return (b.rating-a.rating)||(b.ts-a.ts)});
+  var tEl=document.getElementById('homeToplist');
+  if(!tEl)return;
+  var th='<div class="toplist-title">Topplista</div>';
+  if(!rated.length){
+    tEl.innerHTML=th+'<div class="toplist-empty">Ingen vurderinger enn\u00e5</div>';
+    return;
+  }
+  th+='<div class="toplist-items">';
+  var m=Math.min(rated.length,5);
+  for(var j=0;j<m;j++){
+    var b=rated[j],stars='\u2605'.repeat(b.rating)+'\u2606'.repeat(5-b.rating);
+    th+='<div class="toplist-row" data-id="'+b.id+'"><div class="toplist-rank">'+(j+1)+'</div><div class="toplist-info"><div class="toplist-name">'+esc(b.name)+'</div><div class="toplist-sub">'+esc(b.brewery||b.user)+'</div></div><div class="toplist-stars">'+stars+'</div></div>';
+  }
+  th+='</div>';
+  tEl.innerHTML=th;
+  tEl.querySelectorAll('.toplist-row').forEach(function(r){
+    r.addEventListener('click',function(){openModal(this.dataset.id)});
+  });
 }
 
 /* ── Beer List ── */
