@@ -189,7 +189,7 @@ input[type=file]{display:none}
 <div id="homeScreen" class="screen">
   <div class="bg"></div>
   <div class="home-user-pill" onclick="doLogout()"><span id="homeUser"></span><span style="font-size:14px">⎋</span></div>
-  <div class="app-version">v2026.05.31d</div>
+  <div class="app-version">v2026.05.31e</div>
   <div class="home-panel glass">
     <div class="panel-newest">Nyeste øl<span id="newestInfo">Ingen øl lagt til ennå</span></div>
     <div class="panel-buttons">
@@ -487,7 +487,7 @@ function renderHomeExtras(){
   var m=Math.min(rated.length,5);
   for(var j=0;j<m;j++){
     var b=rated[j],stars='\u2605'.repeat(b.rating)+'\u2606'.repeat(5-b.rating);
-    th+='<div class="toplist-row" data-id="'+b.id+'"><div class="toplist-rank">'+(j+1)+'</div><div class="toplist-info"><div class="toplist-name">'+esc(b.name)+'</div><div class="toplist-sub">'+esc(b.brewery||b.user)+'</div></div><div class="toplist-stars">'+stars+'</div></div>';
+    th+='<div class="toplist-row" data-id="'+b.id+'"><div class="toplist-name">'+esc(b.name)+'</div><div class="toplist-stars">'+stars+'</div></div>';
   }
   th+='</div>';
   tEl.innerHTML=th;
