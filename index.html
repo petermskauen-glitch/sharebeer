@@ -66,7 +66,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow
 .collage-tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s ease}
 .collage-tile:active img{transform:scale(0.94)}
 .collage-empty{height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.85);font-size:12px;font-weight:600;text-align:center;padding:0 14px}
-.home-toplist{flex:1;border-radius:14px;padding:11px 11px 6px;display:flex;flex-direction:column;gap:8px;overflow:hidden;background:rgba(55,34,15,0.28);border:1px solid rgba(0,0,0,0.42);box-shadow:inset 0 2px 5px rgba(0,0,0,0.5),inset 0 -1px 2px rgba(255,255,255,0.12),inset 0 0 14px rgba(0,0,0,0.28)}
+.home-toplist{flex:1;border-radius:14px;padding:11px 11px 6px;display:flex;flex-direction:column;gap:8px;overflow:hidden;background:transparent;border:10px solid rgba(38,22,8,0.55);box-shadow:inset 0 2px 4px rgba(0,0,0,0.55),inset 0 -2px 3px rgba(255,255,255,0.12)}
 .toplist-title{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(38,22,8,0.82);flex-shrink:0}
 .toplist-items{display:flex;flex-direction:column;gap:6px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:5px}
 .toplist-row{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:7px 10px;border-radius:9px;background:transparent;cursor:pointer;transition:background .15s ease}
@@ -186,7 +186,7 @@ input[type=file]{display:none}
 <!-- HOME -->
 <div id="homeScreen" class="screen">
   <div class="bg"></div>
-  <div class="app-version">v2026.06.02</div>
+  <div class="app-version">v2026.06.02b</div>
   <div class="home-panel glass">
     <div class="home-logout" onclick="doLogout()" title="Logg ut"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
     <div class="panel-newest">Nyeste øl<span id="newestInfo">Ingen øl lagt til ennå</span></div>
