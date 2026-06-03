@@ -72,11 +72,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow
 .toplist-inner{flex:1;display:flex;flex-direction:column;gap:8px;overflow:hidden;padding:2px}
 .toplist-head{display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;flex-shrink:0}
 .toplist-title{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(38,22,8,0.82)}
-.toplist-drop{position:relative;width:26px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0.32;transition:opacity .15s ease}
-.toplist-drop.active{opacity:1}
-.toplist-drop svg{position:absolute;inset:0;width:100%;height:100%;fill:none;stroke:rgba(38,22,8,0.9);stroke-width:1.6}
-.toplist-drop.active svg{fill:rgba(70,120,180,0.4)}
-.toplist-drop span{position:relative;font-size:7.5px;font-weight:800;color:rgba(38,22,8,0.95);margin-top:5px}
+.afri-switch{position:relative;width:52px;height:24px;border-radius:12px;cursor:pointer;flex-shrink:0;background:linear-gradient(180deg,#9b9b9b,#838383);box-shadow:inset 0 1.5px 2px rgba(0,0,0,0.4),inset 0 -1px 1px rgba(255,255,255,0.25);transition:background .2s ease}
+.afri-switch.active{background:linear-gradient(180deg,#6bb073,#549a5d)}
+.afri-text{position:absolute;top:0;bottom:0;display:flex;align-items:center;font-size:8px;font-weight:800;letter-spacing:.06em;color:rgba(255,255,255,0.9);text-shadow:0 1px 1px rgba(0,0,0,0.3)}
+.afri-switch:not(.active) .afri-text{right:7px}
+.afri-switch.active .afri-text{left:8px}
+.afri-knob{position:absolute;top:1.5px;left:1.5px;width:21px;height:21px;border-radius:50%;background:radial-gradient(circle at 38% 30%,#fff,#e6e6e6);box-shadow:0 1px 2.5px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;transition:transform .22s cubic-bezier(.4,0,.2,1)}
+.afri-switch.active .afri-knob{transform:translateX(28px)}
+.afri-knob svg{position:absolute;width:14px;height:17px;top:2px;fill:#c9e1f4;stroke:#9a8478;stroke-width:1.4}
+.afri-knob .pct{position:absolute;font-size:6px;font-weight:800;color:#3a3a3a;top:9.5px}
 .toplist-items{display:flex;flex-direction:column;gap:6px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:5px}
 .toplist-row{display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:7px 10px;border-radius:9px;background:transparent;cursor:pointer;transition:background .15s ease}
 .toplist-row:active{background:rgba(0,0,0,0.12)}
@@ -495,7 +499,7 @@ function renderHomeExtras(){
   }).sort(function(a,b){return (b.rating-a.rating)||(b.ts-a.ts)});
   var tEl=document.getElementById('homeToplist');
   if(!tEl)return;
-  var th='<div class="toplist-head"><div class="toplist-title">Toppliste</div><div class="toplist-drop'+(toplistAlkoholfri?' active':'')+'" onclick="toggleToplistAlkoholfri()" title="Vis alkoholfri"><svg viewBox="0 0 24 30"><path d="M12 1 C12 1 3 13 3 20 a9 9 0 0 0 18 0 C21 13 12 1 12 1 Z"/></svg><span>0%</span></div></div>';
+  var th='<div class="toplist-head"><div class="toplist-title">Toppliste</div><div class="afri-switch'+(toplistAlkoholfri?' active':'')+'" onclick="toggleToplistAlkoholfri()" title="Alkoholfri toppliste"><span class="afri-text">'+(toplistAlkoholfri?'ON':'OFF')+'</span><span class="afri-knob"><svg viewBox="0 0 24 30"><path d="M12 1 C12 1 3 13 3 20 a9 9 0 0 0 18 0 C21 13 12 1 12 1 Z"/></svg><span class="pct">0%</span></span></div></div>';
   if(!rated.length){
     tEl.innerHTML='<div class="toplist-inner">'+th+'<div class="toplist-empty">Ingen vurderinger enn\u00e5</div></div>';
     return;
