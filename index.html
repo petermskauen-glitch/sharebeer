@@ -65,13 +65,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow
 .app-version{position:absolute;bottom:6px;left:8px;font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:.04em;z-index:5;pointer-events:none}
 /* Home right column: photo wall + toplist */
 .home-right{position:absolute;top:10px;bottom:10px;left:calc(52% + 6px);right:10px;display:flex;flex-direction:column;gap:8px;z-index:2}
-.home-collage{flex:1.15;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25)}
-.collage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;height:100%;align-content:start;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.home-collage{flex:0 0 auto;border-radius:18px;overflow:hidden;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25)}
+.collage-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;align-content:start}
 .collage-tile{aspect-ratio:1;overflow:hidden;cursor:pointer}
 .collage-tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s ease}
 .collage-tile:active img{transform:scale(0.94)}
 .collage-empty{height:100%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.85);font-size:12px;font-weight:600;text-align:center;padding:0 14px}
-.home-toplist{flex:1;display:flex;flex-direction:column;overflow:hidden;background:transparent;border:none;box-shadow:none}
+.home-toplist{flex:0 1 auto;margin-top:auto;display:flex;flex-direction:column;overflow:hidden;background:transparent;border:none;box-shadow:none}
 .toplist-inner{flex:1;display:flex;flex-direction:column;gap:8px;overflow:hidden;padding:2px}
 .toplist-head{display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;flex-shrink:0}
 .toplist-title{font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(38,22,8,0.82)}
