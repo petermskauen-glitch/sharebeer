@@ -240,7 +240,8 @@ input[type=file]{display:none}
 <div id="loginScreen" class="screen active">
   <div class="bg"></div>
   <div class="login-box glass">
-    <input type="password" id="pwInput" placeholder="Skriv passord…" autocomplete="current-password">
+    <input type="email" id="emailInput" placeholder="E-post" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <input type="password" id="pwInput" placeholder="Passord" autocomplete="current-password">
     <div class="login-error" id="loginError"></div>
     <div class="stay-row">
       <span class="stay-label">Forbli innlogget</span>
@@ -449,6 +450,7 @@ input[type=file]{display:none}
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script>
 // ── Firebase ──────────────────────────────────────────────────
 const firebaseConfig = {
@@ -461,11 +463,13 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth();
 // Offline-lagring: viser øl umiddelbart fra lokal cache ved oppstart,
 // oppdaterer fra nett i bakgrunnen. (Guard for at preview-stubben ikke har den.)
 if(db.enablePersistence){db.enablePersistence({synchronizeTabs:true}).catch(function(){});}
 
-const USERS={marius:'Marius',peter:'Peter'};
+// E-post -> visningsnavn. Kontoene opprettes i Firebase-konsollen.
+const ACCOUNTS={'marius@sharebeer.app':'Marius','peter@sharebeer.app':'Peter'};
 let currentUser=null,currentListUser=null,selectedRating=0,pendingImageB64=null,editingId=null;
 let toplistAlkoholfri=false;
 let beersCache=[];
@@ -515,8 +519,15 @@ function compressImage(dataUrl,cb){
 }
 
 /* ── Session ── */
-function saveSession(user){localStorage.setItem('sharebeer_session',user||'')}
-function loadSession(){return localStorage.getItem('sharebeer_session')||''}
+function authErrorMessage(e){
+  var c=(e&&e.code)||'';
+  if(c==='auth/invalid-email')return 'Ugyldig e-postadresse.';
+  if(c==='auth/missing-password')return 'Skriv inn passord.';
+  if(c==='auth/invalid-credential'||c==='auth/wrong-password'||c==='auth/user-not-found')return 'Feil e-post eller passord.';
+  if(c==='auth/too-many-requests')return 'For mange forsøk. Vent litt og prøv igjen.';
+  if(c==='auth/network-request-failed')return 'Nettverksfeil. Sjekk tilkoblingen.';
+  return 'Innlogging feilet. Prøv igjen.';
+}
 
 /* ── Navigation ── */
 function setHome(){
@@ -577,38 +588,41 @@ function goHome(){
 /* ── Login ── */
 document.getElementById('pwInput').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
 
-(function init(){
-  var saved=loadSession();
-  if(saved&&USERS[saved]){
-    currentUser=USERS[saved];
-    document.getElementById('stayToggle').checked=true;
-    startSync();refreshHome();
-    setHome();
-  }
-})();
-
-function doLogin(){
-  var pw=document.getElementById('pwInput').value.trim().toLowerCase();
-  var err=document.getElementById('loginError');
-  if(USERS[pw]){
-    currentUser=USERS[pw];err.textContent='';
-    document.getElementById('pwInput').value='';
-    if(document.getElementById('stayToggle').checked){saveSession(pw)}else{saveSession('')}
-    startSync();refreshHome();
+auth.onAuthStateChanged(function(user){
+  if(user){
+    currentUser=ACCOUNTS[(user.email||'').toLowerCase()]||user.email||'';
     document.getElementById('loginScreen').classList.remove('active');
+    startSync();refreshHome();
     setHome();
   }else{
-    err.textContent='Feil passord. Pr\u00f8v igjen.';
-    document.getElementById('pwInput').value='';
+    if(unsubscribeSync){unsubscribeSync();unsubscribeSync=null;}
+    beersCache=[];currentUser=null;
+    ['homeScreen','listScreen','addScreen','searchScreen','statsScreen'].forEach(function(s){
+      document.getElementById(s).classList.remove('active','push-left');
+    });
+    document.getElementById('loginScreen').classList.add('active');
   }
-}
-function doLogout(){if(unsubscribeSync){unsubscribeSync();unsubscribeSync=null;}beersCache=[];
-  currentUser=null;
-  saveSession('');
-  ['homeScreen','listScreen','addScreen'].forEach(function(s){
-    document.getElementById(s).classList.remove('active','push-left');
+});
+
+function doLogin(){
+  var email=document.getElementById('emailInput').value.trim();
+  var pw=document.getElementById('pwInput').value;
+  var err=document.getElementById('loginError');
+  err.textContent='';
+  if(!email||!pw){err.textContent='Fyll inn e-post og passord.';return;}
+  var persistence=document.getElementById('stayToggle').checked
+    ? firebase.auth.Auth.Persistence.LOCAL
+    : firebase.auth.Auth.Persistence.SESSION;
+  auth.setPersistence(persistence).then(function(){
+    return auth.signInWithEmailAndPassword(email,pw);
+  }).then(function(){
+    document.getElementById('pwInput').value='';
+  }).catch(function(e){
+    err.textContent=authErrorMessage(e);
   });
-  document.getElementById('loginScreen').classList.add('active');
+}
+function doLogout(){
+  auth.signOut().catch(function(){});
 }
 
 /* ── Home ── */
