@@ -201,7 +201,7 @@ input[type=file]{display:none}
 <!-- HOME -->
 <div id="homeScreen" class="screen">
   <div class="bg"></div>
-  <div class="app-version">v2026.06.03</div>
+  <div class="app-version">v2026.06.03b</div>
   <div class="home-panel">
     <div class="home-logout" onclick="doLogout()" title="Logg ut"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
     <div class="panel-newest"><div class="newest-label">Nyeste øl</div><div class="newest-date" id="newestDate"></div><div class="newest-sub" id="newestTime"></div><div class="newest-sub" id="newestWho"></div></div>
@@ -417,7 +417,35 @@ function setHome(){
       setTimeout(function(){document.getElementById(s).style.transform=''},350);
     }
   });
+  repaintGlass();
 }
+// iOS Safari tegner ofte ikke backdrop-filter ved første opptegning/gjenopptak;
+// panelet blir grått til noe trigger en ny opptegning. Vi tvinger den fram.
+function repaintGlass(){
+  var p=document.querySelector('.home-panel');
+  if(!p)return;
+  var doNudge=function(){
+    p.style.webkitBackdropFilter='none';
+    p.style.backdropFilter='none';
+    void p.offsetWidth;
+    requestAnimationFrame(function(){
+      p.style.webkitBackdropFilter='';
+      p.style.backdropFilter='';
+    });
+  };
+  doNudge();
+  setTimeout(doNudge,250);
+  setTimeout(doNudge,700);
+}
+(function(){
+  // Forhåndslast bakgrunnsbildet og tving ny opptegning når det er klart
+  var im=new Image();
+  im.onload=repaintGlass;
+  im.src='bakgrunnsbilde.JPEG';
+  // Gjenopptak av appen fra hjem-skjerm / fanebytte
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)repaintGlass();});
+  window.addEventListener('pageshow',repaintGlass);
+})();
 function showOverlay(id){
   document.getElementById('homeScreen').classList.add('active','push-left');
   ['listScreen','addScreen','searchScreen'].forEach(function(s){
