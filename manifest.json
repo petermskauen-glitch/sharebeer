@@ -1,0 +1,15 @@
+{
+  "name": "Share Beer",
+  "short_name": "Share Beer",
+  "description": "Delt øl-loggbok for Marius og Peter",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#3a2410",
+  "theme_color": "#3a2410",
+  "icons": [
+    { "src": "icon.png", "sizes": "1306x1306", "type": "image/png", "purpose": "any" },
+    { "src": "icon.png", "sizes": "1306x1306", "type": "image/png", "purpose": "maskable" }
+  ]
+}

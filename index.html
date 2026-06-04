@@ -9,6 +9,8 @@
 <meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#3a2410">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Share Beer">
@@ -217,6 +219,11 @@ input[type=file]{display:none}
 .versus-sub{font-size:9.5px;font-weight:700;color:rgba(58,36,16,0.55);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
 .versus-vs{display:flex;align-items:center;font-size:13px;font-weight:900;color:rgba(58,36,16,0.4)}
 .stats-empty{font-size:14px;color:rgba(58,36,16,0.7);font-weight:600;text-align:center;padding:30px 10px}
+/* LAGRE-TILBAKEMELDING (toast) */
+.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);z-index:300;display:flex;align-items:center;gap:8px;padding:12px 20px;border-radius:30px;font-size:14px;font-weight:700;color:#2a1808;background:linear-gradient(160deg,rgba(255,250,243,0.92),rgba(255,245,235,0.85));backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5);border:1px solid rgba(255,255,255,0.7);box-shadow:0 10px 30px rgba(20,12,4,0.35);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{color:#7a1f15;background:linear-gradient(160deg,rgba(255,238,235,0.95),rgba(255,228,224,0.9));border-color:rgba(192,57,43,0.3)}
+.toast-ic{font-size:15px;line-height:1}
 </style>
 </head>
 <body>
@@ -352,6 +359,10 @@ input[type=file]{display:none}
       <input type="search" id="searchInput" placeholder="Søk etter øl, bryggeri…" oninput="doSearch()" autocomplete="off">
     </div>
     <div class="search-sort-row">
+      <span class="search-sort-label">Stil</span>
+      <select id="searchStyle" class="search-sort" onchange="doSearch()"><option value="__all__">Alle stiler</option></select>
+    </div>
+    <div class="search-sort-row">
       <span class="search-sort-label">Sorter etter</span>
       <select id="searchSort" class="search-sort" onchange="doSearch()">
         <option value="newest">Nyeste først</option>
@@ -411,8 +422,10 @@ input[type=file]{display:none}
       <button class="modal-btn-delete" id="modalDeleteBtn">Slett</button>
     </div>
   </div>
+  </div>
 </div>
 
+<div id="toast" class="toast"></div>
 
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -690,15 +703,26 @@ document.getElementById('modalBackdrop').addEventListener('click',function(e){if
 function deleteBeer(id){
   if(!confirm('Vil du slette dette \u00f8let?'))return;
   db.collection('beers').doc(id).delete().then(function(){
-    closeModal();
-  }).catch(function(e){alert('Feil ved sletting: '+e.message)});
+    closeModal();showToast('Øl slettet');
+  }).catch(function(e){showToast('Kunne ikke slette: '+e.message,'error')});
 }
 
 /* ── Add / Edit ── */
 
+function populateStyleFilter(){
+  var sel=document.getElementById('searchStyle');
+  var styles=[];
+  loadBeers().forEach(function(b){if(b.style&&styles.indexOf(b.style)<0)styles.push(b.style);});
+  styles.sort();
+  var h='<option value="__all__">Alle stiler</option>';
+  styles.forEach(function(s){h+='<option value="'+esc(s)+'">'+esc(s)+'</option>';});
+  sel.innerHTML=h;
+}
 function showSearch(){
   document.getElementById('searchInput').value='';
   document.getElementById('searchSort').value='newest';
+  populateStyleFilter();
+  document.getElementById('searchStyle').value='__all__';
   doSearch();
   showOverlay('searchScreen');
   setTimeout(function(){document.getElementById('searchInput').focus()},400);
@@ -706,8 +730,10 @@ function showSearch(){
 function doSearch(){
   var q=document.getElementById('searchInput').value.trim().toLowerCase();
   var sort=document.getElementById('searchSort').value;
+  var styleSel=document.getElementById('searchStyle').value;
   var el=document.getElementById('searchGrid');
   var beers=loadBeers().filter(function(b){
+    if(styleSel!=='__all__'&&b.style!==styleSel)return false;
     if(!q)return true;
     return (b.name&&b.name.toLowerCase().indexOf(q)>-1)||
            (b.brewery&&b.brewery.toLowerCase().indexOf(q)>-1)||
@@ -862,14 +888,14 @@ function saveBeer(){
       db.collection('beers').doc(editingId).set(beerData).then(function(){
         currentListUser=beerData.user;
         document.getElementById('listTitle').textContent=beerData.user+'s \u00f8l';
-        renderList();showOverlay('listScreen');
-      }).catch(function(e){alert('Feil: '+e.message)});
+        renderList();showOverlay('listScreen');showToast('Endringer lagret');
+      }).catch(function(e){showToast('Kunne ikke lagre: '+e.message,'error')});
     }else{
       beerData.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
       beerData.user=currentUser;
       db.collection('beers').doc(beerData.id).set(beerData).then(function(){
-        goHome();
-      }).catch(function(e){alert('Feil: '+e.message)});
+        goHome();showToast('Øl lagret 🍺');
+      }).catch(function(e){showToast('Kunne ikke lagre: '+e.message,'error')});
     }
   }
   if(pendingImageB64&&pendingImageB64.length>200000){
@@ -968,6 +994,24 @@ function renderStats(){
     h+='</div></div>';
   }
   el.innerHTML=h;
+}
+
+/* ── Lagre-tilbakemelding ── */
+var toastTimer=null;
+function showToast(msg,type){
+  var t=document.getElementById('toast');
+  if(!t)return;
+  t.className='toast'+(type==='error'?' error':'');
+  t.innerHTML='<span class="toast-ic">'+(type==='error'?'⚠️':'✓')+'</span>'+esc(msg);
+  void t.offsetWidth;
+  t.classList.add('show');
+  if(toastTimer)clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){t.classList.remove('show');},type==='error'?3400:1900);
+}
+
+/* ── PWA: service worker ── */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});
 }
 </script>
 </body>
