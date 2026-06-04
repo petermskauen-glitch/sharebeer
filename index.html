@@ -201,7 +201,7 @@ input[type=file]{display:none}
 <!-- HOME -->
 <div id="homeScreen" class="screen">
   <div class="bg"></div>
-  <div class="app-version">v2026.06.03b</div>
+  <div class="app-version">v2026.06.03c</div>
   <div class="home-panel">
     <div class="home-logout" onclick="doLogout()" title="Logg ut"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
     <div class="panel-newest"><div class="newest-label">Nyeste øl</div><div class="newest-date" id="newestDate"></div><div class="newest-sub" id="newestTime"></div><div class="newest-sub" id="newestWho"></div></div>
@@ -365,6 +365,9 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+// Offline-lagring: viser øl umiddelbart fra lokal cache ved oppstart,
+// oppdaterer fra nett i bakgrunnen. (Guard for at preview-stubben ikke har den.)
+if(db.enablePersistence){db.enablePersistence({synchronizeTabs:true}).catch(function(){});}
 
 const USERS={marius:'Marius',peter:'Peter'};
 let currentUser=null,currentListUser=null,selectedRating=0,pendingImageB64=null,editingId=null;
