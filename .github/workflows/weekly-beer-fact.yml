@@ -1,0 +1,33 @@
+name: Ukentlig øl-fakta
+
+on:
+  schedule:
+    # 06:00 UTC hver fredag (~07:00 vinter / 08:00 sommer norsk tid)
+    - cron: '0 6 * * 5'
+  workflow_dispatch:   # lar deg kjøre den manuelt fra Actions-fanen (for test)
+
+permissions:
+  contents: read
+
+jobs:
+  generate-fact:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Hent kode
+        uses: actions/checkout@v4
+
+      - name: Sett opp Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Installer avhengigheter
+        working-directory: scripts
+        run: npm install
+
+      - name: Generer og lagre øl-fakta
+        working-directory: scripts
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node weekly-beer-fact.js

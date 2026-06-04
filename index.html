@@ -219,6 +219,10 @@ input[type=file]{display:none}
 .versus-sub{font-size:9.5px;font-weight:700;color:rgba(58,36,16,0.55);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
 .versus-vs{display:flex;align-items:center;font-size:13px;font-weight:900;color:rgba(58,36,16,0.4)}
 .stats-empty{font-size:14px;color:rgba(58,36,16,0.7);font-weight:600;text-align:center;padding:30px 10px}
+/* FREDAGS FAKTA */
+.fact-card{margin-top:14px;padding:11px 13px;border-radius:14px;border:1px solid rgba(58,36,16,0.25)}
+.fact-label{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:rgba(58,36,16,0.62);display:flex;align-items:center;gap:5px}
+.fact-text{font-size:12.5px;line-height:1.4;font-weight:600;color:rgba(34,19,6,0.9);margin-top:4px}
 .export-row{display:flex;gap:10px}
 .export-btn{flex:1;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.5);background:linear-gradient(160deg,rgba(255,250,243,0.6),rgba(255,245,235,0.44));color:#3a2410;font-size:13px;font-weight:800;letter-spacing:.03em;cursor:pointer;box-shadow:0 4px 12px rgba(40,25,12,0.16);transition:transform .12s}
 .export-btn:active{transform:scale(0.97)}
@@ -257,6 +261,10 @@ input[type=file]{display:none}
   <div class="home-panel">
     <div class="home-logout" onclick="doLogout()" title="Logg ut"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>
     <div class="panel-newest"><div class="newest-label">Nyeste øl</div><div class="newest-date" id="newestDate"></div><div class="newest-sub" id="newestTime"></div><div class="newest-sub" id="newestWho"></div></div>
+    <div class="fact-card" id="factCard" style="display:none">
+      <div class="fact-label">🍺 Fredags fakta</div>
+      <div class="fact-text" id="factText"></div>
+    </div>
     <div class="panel-buttons">
       <button class="btn-user" onclick="showList('Marius')">Marius</button>
       <button class="btn-user" onclick="showList('Peter')">Peter</button>
@@ -476,6 +484,18 @@ function startSync(){
     if(document.getElementById('searchScreen').classList.contains('active'))doSearch();
     if(document.getElementById('statsScreen').classList.contains('active'))renderStats();
   },function(err){console.error('Sync error:',err)});
+  loadWeeklyFact();
+}
+function loadWeeklyFact(){
+  var card=document.getElementById('factCard');
+  if(!card||!db||!db.collection)return;
+  db.collection('meta').doc('weeklyFact').get().then(function(doc){
+    var data=doc&&doc.exists?doc.data():null;
+    if(data&&data.text){
+      document.getElementById('factText').textContent=data.text;
+      card.style.display='';
+    }else{card.style.display='none';}
+  }).catch(function(){card.style.display='none';});
 }
 function loadBeers(){return beersCache}
 function pad(n){return String(n).padStart(2,'0')}

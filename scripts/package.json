@@ -1,0 +1,10 @@
+{
+  "name": "weekly-beer-fact",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Genererer ukentlig øl-fakta med Gemini og skriver til Firestore",
+  "main": "weekly-beer-fact.js",
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
