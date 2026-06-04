@@ -28,7 +28,11 @@ async function generateFact() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts: [{ text: PROMPT }] }],
-      generationConfig: { temperature: 1.1, maxOutputTokens: 200 }
+      generationConfig: {
+        temperature: 1.1,
+        maxOutputTokens: 256,
+        thinkingConfig: { thinkingBudget: 0 }
+      }
     })
   });
   if (!res.ok) {
