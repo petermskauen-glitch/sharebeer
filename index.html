@@ -219,6 +219,10 @@ input[type=file]{display:none}
 .versus-sub{font-size:9.5px;font-weight:700;color:rgba(58,36,16,0.55);text-transform:uppercase;letter-spacing:.03em;margin-top:2px}
 .versus-vs{display:flex;align-items:center;font-size:13px;font-weight:900;color:rgba(58,36,16,0.4)}
 .stats-empty{font-size:14px;color:rgba(58,36,16,0.7);font-weight:600;text-align:center;padding:30px 10px}
+.export-row{display:flex;gap:10px}
+.export-btn{flex:1;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,0.5);background:linear-gradient(160deg,rgba(255,250,243,0.6),rgba(255,245,235,0.44));color:#3a2410;font-size:13px;font-weight:800;letter-spacing:.03em;cursor:pointer;box-shadow:0 4px 12px rgba(40,25,12,0.16);transition:transform .12s}
+.export-btn:active{transform:scale(0.97)}
+.export-hint{font-size:11px;color:rgba(58,36,16,0.55);font-weight:600;padding:0 2px}
 /* LAGRE-TILBAKEMELDING (toast) */
 .toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);z-index:300;display:flex;align-items:center;gap:8px;padding:12px 20px;border-radius:30px;font-size:14px;font-weight:700;color:#2a1808;background:linear-gradient(160deg,rgba(255,250,243,0.92),rgba(255,245,235,0.85));backdrop-filter:blur(16px) saturate(1.5);-webkit-backdrop-filter:blur(16px) saturate(1.5);border:1px solid rgba(255,255,255,0.7);box-shadow:0 10px 30px rgba(20,12,4,0.35);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -392,6 +396,14 @@ input[type=file]{display:none}
         <div class="stats-seg-btn" data-u="Peter" onclick="setStatsUser('Peter')">Peter</div>
       </div>
       <div id="statsContent"></div>
+      <div class="stats-section">
+        <div class="stats-section-title">Eksport / backup</div>
+        <div class="export-row">
+          <button class="export-btn" onclick="exportCSV()">Last ned CSV</button>
+          <button class="export-btn" onclick="exportJSON()">Last ned JSON</button>
+        </div>
+        <div class="export-hint">Laster ned alle øl til enheten din. JSON inkluderer bilder (full backup), CSV er en tabell for regneark.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -994,6 +1006,36 @@ function renderStats(){
     h+='</div></div>';
   }
   el.innerHTML=h;
+}
+
+/* ── Eksport / backup ── */
+function dateStamp(){var d=new Date();return ''+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+function downloadFile(filename,content,mime){
+  var blob=new Blob([content],{type:mime});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},0);
+}
+function exportJSON(){
+  var data=loadBeers().slice().sort(function(a,b){return a.ts-b.ts;});
+  downloadFile('share-beer-backup-'+dateStamp()+'.json',JSON.stringify(data,null,2),'application/json');
+  showToast('JSON lastet ned');
+}
+function csvEscape(v){if(v==null)return '';v=String(v);return /[",\n\r;]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function exportCSV(){
+  var data=loadBeers().slice().sort(function(a,b){return a.ts-b.ts;});
+  var cols=['ts','dato','bruker','navn','bryggeri','stil','alkohol','alkoholfri','rating','kjopt_pa','notater'];
+  var rows=[cols.join(',')];
+  data.forEach(function(b){
+    var d=new Date(b.ts);
+    var dato=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+    var row=[b.ts,dato,b.user,b.name,b.brewery,b.style,b.abv,b.alkoholfri?'ja':'nei',b.rating,b.purchased,b.notes];
+    rows.push(row.map(csvEscape).join(','));
+  });
+  downloadFile('share-beer-backup-'+dateStamp()+'.csv','﻿'+rows.join('\r\n'),'text/csv;charset=utf-8');
+  showToast('CSV lastet ned');
 }
 
 /* ── Lagre-tilbakemelding ── */
