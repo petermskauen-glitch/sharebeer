@@ -474,6 +474,7 @@ let currentUser=null,currentListUser=null,selectedRating=0,pendingImageB64=null,
 let toplistAlkoholfri=false;
 let beersCache=[];
 let unsubscribeSync=null;
+let unsubscribeFact=null;
 const DAYS=['\u00f8ndag','mandag','tirsdag','onsdag','torsdag','fredag','l\u00f8rdag'];
 const MONTHS=['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
 const MONTHS_LONG=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
@@ -493,13 +494,18 @@ function startSync(){
 function loadWeeklyFact(){
   var card=document.getElementById('factCard');
   if(!card||!db||!db.collection)return;
-  db.collection('meta').doc('weeklyFact').get().then(function(doc){
+  if(unsubscribeFact){unsubscribeFact();unsubscribeFact=null;}
+  // Sanntidslytter: viser boksen så snart dataene er der (tåler treghet på Safari/PWA),
+  // og skjuler den ikke ved en midlertidig nettverksfeil.
+  unsubscribeFact=db.collection('meta').doc('weeklyFact').onSnapshot(function(doc){
     var data=doc&&doc.exists?doc.data():null;
     if(data&&data.text){
       document.getElementById('factText').textContent=data.text;
       card.style.display='';
-    }else{card.style.display='none';}
-  }).catch(function(){card.style.display='none';});
+    }else{
+      card.style.display='none';
+    }
+  },function(){/* midlertidig feil: la kortet stå som det er */});
 }
 function loadBeers(){return beersCache}
 function pad(n){return String(n).padStart(2,'0')}
@@ -596,6 +602,7 @@ auth.onAuthStateChanged(function(user){
     setHome();
   }else{
     if(unsubscribeSync){unsubscribeSync();unsubscribeSync=null;}
+    if(unsubscribeFact){unsubscribeFact();unsubscribeFact=null;}
     beersCache=[];currentUser=null;
     ['homeScreen','listScreen','addScreen','searchScreen','statsScreen'].forEach(function(s){
       document.getElementById(s).classList.remove('active','push-left');
