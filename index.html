@@ -120,6 +120,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow
 .field label{font-size:11px;font-weight:700;color:rgba(0,0,0,0.55);text-transform:uppercase;letter-spacing:.05em}
 .field input,.field textarea{padding:10px 13px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,250,244,0.5);font-size:16px;color:#111;outline:none;-webkit-appearance:none;font-family:inherit;width:100%}
 .field input:focus,.field textarea:focus{border-color:rgba(0,0,0,0.35);background:rgba(255,250,244,0.68)}
+.ac-wrap{position:relative}
+.ac-list{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:30;background:rgba(255,252,247,0.98);border:1.5px solid rgba(0,0,0,0.12);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.18);overflow:hidden;display:none;max-height:210px;overflow-y:auto;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.ac-item{padding:10px 13px;font-size:15px;color:#111;cursor:pointer;border-bottom:1px solid rgba(0,0,0,0.06)}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.active{background:rgba(58,36,16,0.09)}
 .field textarea{resize:none;min-height:72px}
 .rating-row{display:flex;gap:3px}
 .rating-btn{flex:1;padding:8px 0;border:1.5px solid rgba(255,255,255,0.5);border-radius:7px;background:rgba(255,250,244,0.5);font-size:13px;cursor:pointer;text-align:center}
@@ -314,8 +319,8 @@ input[type=file]{display:none}
       <h2 id="addTitle">Legg til øl</h2>
     </div>
     <div class="add-panel-body">
-      <div class="field"><label>Navn på ølet *</label><input type="text" id="f_name" placeholder="f.eks. Nøgne Ø #100"></div>
-      <div class="field"><label>Bryggeri</label><input type="text" id="f_brewery" placeholder="f.eks. Nøgne Ø"></div>
+      <div class="field"><label>Navn på ølet *</label><div class="ac-wrap"><input type="text" id="f_name" placeholder="f.eks. Nøgne Ø #100" autocomplete="off"><div class="ac-list" id="ac_name"></div></div></div>
+      <div class="field"><label>Bryggeri</label><div class="ac-wrap"><input type="text" id="f_brewery" placeholder="f.eks. Nøgne Ø" autocomplete="off"><div class="ac-list" id="ac_brewery"></div></div></div>
       <div class="field"><label>Øltype</label><div class="style-grid" id="styleGrid"><label class="style-radio-label"><input type="radio" name="beerStyle" value="Pilsner" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Pilsner</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Lys lager" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Lys lager</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Mørk lager" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Mørk lager</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Bayer" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Bayer</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Bitter" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Bitter</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="IPA" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>IPA</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Annen Pale Ale" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Annen Pale Ale</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Brown ale" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Brown ale</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Red ale" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Red ale</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Porter" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Porter</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Stout" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Stout</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Weissbier/wit" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Weissbier/wit</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Belgisk ale" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Belgisk ale</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Belgisk trippel" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Belgisk trippel</label><label class="style-radio-label"><input type="radio" name="beerStyle" value="Annet" onchange="onStyleChange()"><span class="round-radio"><span class="round-radio-dot"></span></span>Annet</label></div><input type="text" id="f_style_other" style="display:none;margin-top:6px" placeholder="Skriv øltype…"></div>
       <div class="field"><label>Alkohol %</label><div class="abv-row"><input type="number" id="f_abv" class="abv-input" placeholder="f.eks. 5.5" step="0.1" min="0" max="99"><label class="round-check-label"><input type="checkbox" id="f_alkoholfri" onchange="toggleAlkoholfri()"><span class="round-check"><span class="round-check-dot"></span></span>Alkoholfri</label></div></div>
       <div class="field">
@@ -438,7 +443,7 @@ input[type=file]{display:none}
       </div>
       <div class="modal-notes" id="modalNotes" style="display:none"></div>
     </div>
-    <div class="modal-actions">
+    <div class="modal-actions" id="modalActions">
       <button class="modal-btn-edit" id="modalEditBtn">Rediger</button>
       <button class="modal-btn-delete" id="modalDeleteBtn">Slett</button>
     </div>
@@ -746,6 +751,8 @@ function openModal(id){
   document.getElementById('modalDate').textContent=DAYS[d.getDay()]+' '+d.getDate()+'. '+MONTHS_LONG[d.getMonth()]+' '+d.getFullYear();
   document.getElementById('modalTime').textContent=pad(d.getHours())+':'+pad(d.getMinutes());
   document.getElementById('modalUser').textContent=b.user;
+  var isOwner=(b.user===currentUser);
+  document.getElementById('modalActions').style.display=isOwner?'':'none';
   document.getElementById('modalEditBtn').onclick=function(){closeModal();showEdit(id)};
   document.getElementById('modalDeleteBtn').onclick=function(){deleteBeer(id)};
   document.getElementById('modalBackdrop').classList.add('open');
@@ -754,6 +761,9 @@ function closeModal(){document.getElementById('modalBackdrop').classList.remove(
 document.getElementById('modalBackdrop').addEventListener('click',function(e){if(e.target===this)closeModal()});
 
 function deleteBeer(id){
+  var bs=loadBeers(),target=null;
+  for(var i=0;i<bs.length;i++){if(bs[i].id===id){target=bs[i];break}}
+  if(target&&target.user!==currentUser){showToast('Du kan bare slette din egen \u00f8l','error');return;}
   if(!confirm('Vil du slette dette \u00f8let?'))return;
   db.collection('beers').doc(id).delete().then(function(){
     closeModal();showToast('Øl slettet');
@@ -842,6 +852,7 @@ function showEdit(id){
   var beers=loadBeers(),b=null;
   for(var i=0;i<beers.length;i++){if(beers[i].id===id){b=beers[i];break}}
   if(!b)return;
+  if(b.user!==currentUser){showToast('Du kan bare redigere din egen øl','error');return;}
   editingId=id;selectedRating=b.rating||0;pendingImageB64=b.image||null;
   document.getElementById('f_name').value=b.name;
   document.getElementById('f_brewery').value=b.brewery;
@@ -1091,6 +1102,52 @@ function showToast(msg,type){
   if(toastTimer)clearTimeout(toastTimer);
   toastTimer=setTimeout(function(){t.classList.remove('show');},type==='error'?3400:1900);
 }
+
+/* ── Autoforslag (navn / bryggeri) etter 3 bokstaver ── */
+function uniqueValues(field){
+  var seen={},out=[];
+  loadBeers().forEach(function(b){
+    var v=(b[field]||'').trim();
+    if(v){var k=v.toLowerCase();if(!seen[k]){seen[k]=1;out.push(v);}}
+  });
+  out.sort(function(a,b){return a.localeCompare(b,'nb');});
+  return out;
+}
+function setupAutocomplete(inputId,listId,field){
+  var input=document.getElementById(inputId),list=document.getElementById(listId);
+  if(!input||!list)return;
+  var active=-1;
+  function close(){list.style.display='none';list.innerHTML='';active=-1;}
+  function pick(val){input.value=val;close();input.focus();}
+  function render(){
+    var q=input.value.trim().toLowerCase();
+    if(q.length<3){close();return;}
+    var opts=uniqueValues(field).filter(function(v){
+      var lv=v.toLowerCase();return lv.indexOf(q)>-1&&lv!==q;
+    }).slice(0,6);
+    if(!opts.length){close();return;}
+    active=-1;
+    list.innerHTML=opts.map(function(v){return '<div class="ac-item">'+esc(v)+'</div>';}).join('');
+    list.style.display='block';
+    Array.prototype.forEach.call(list.children,function(el){
+      el.addEventListener('mousedown',function(e){e.preventDefault();pick(el.textContent);});
+    });
+  }
+  input.addEventListener('input',render);
+  input.addEventListener('keydown',function(e){
+    if(list.style.display!=='block')return;
+    var items=list.children;
+    if(e.key==='ArrowDown'){e.preventDefault();active=Math.min(active+1,items.length-1);}
+    else if(e.key==='ArrowUp'){e.preventDefault();active=Math.max(active-1,0);}
+    else if(e.key==='Enter'){if(active>-1){e.preventDefault();pick(items[active].textContent);}return;}
+    else if(e.key==='Escape'){close();return;}
+    else return;
+    Array.prototype.forEach.call(items,function(el,i){el.classList.toggle('active',i===active);});
+  });
+  input.addEventListener('blur',function(){setTimeout(close,150);});
+}
+setupAutocomplete('f_name','ac_name','name');
+setupAutocomplete('f_brewery','ac_brewery','brewery');
 
 /* ── PWA: service worker ── */
 if('serviceWorker' in navigator){
