@@ -175,6 +175,30 @@ input[type=file]{display:none}
 .modal-stars{color:#111;font-size:16px;letter-spacing:1px}
 .modal-tag{font-size:12px;background:rgba(58,36,16,0.09);border-radius:8px;padding:3px 9px;color:#3a2410;font-weight:600}
 .modal-notes{font-size:14px;color:#444;line-height:1.6;white-space:pre-wrap;padding:10px 14px;background:rgba(58,36,16,0.06);border-radius:12px;flex-shrink:0}
+.modal-comments{display:flex;flex-direction:column;gap:8px;flex-shrink:0;border-top:1px solid rgba(58,36,16,0.12);padding-top:12px;margin-top:2px}
+.modal-comments-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:rgba(58,36,16,0.6)}
+.comment{padding:8px 12px;background:rgba(58,36,16,0.06);border-radius:12px}
+.comment-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:2px}
+.comment-by{font-size:12px;font-weight:800;color:#3a2410}
+.comment-when{font-size:11px;color:rgba(0,0,0,0.4);flex-shrink:0}
+.comment-text{font-size:14px;color:#333;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.comment-empty{font-size:13px;color:rgba(58,36,16,0.5);font-style:italic}
+.comment-input-row{display:flex;gap:8px;align-items:flex-end}
+.comment-input-row textarea{flex:1;padding:9px 12px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.5);background:rgba(255,250,244,0.6);font-size:15px;color:#111;outline:none;-webkit-appearance:none;font-family:inherit;resize:none;line-height:1.4}
+.comment-input-row textarea:focus{border-color:rgba(0,0,0,0.35);background:rgba(255,250,244,0.78)}
+.comment-send{flex-shrink:0;width:38px;height:38px;border-radius:50%;border:none;background:#3a2410;color:#f5eddb;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.comment-send svg{width:18px;height:18px;fill:none;stroke:#f5eddb;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.comment-send:disabled{opacity:0.4;cursor:default}
+.inbox-list{display:flex;flex-direction:column;gap:10px;padding:14px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.inbox-item{display:flex;gap:11px;align-items:center;padding:11px 13px;background:linear-gradient(160deg,rgba(255,250,243,0.55),rgba(255,245,235,0.4));border:1px solid rgba(255,255,255,0.45);border-radius:16px;box-shadow:0 4px 12px rgba(40,25,12,0.12);cursor:pointer;position:relative}
+.inbox-item.unread{border-color:rgba(226,59,46,0.45)}
+.inbox-item.unread::before{content:'';position:absolute;top:11px;left:4px;width:7px;height:7px;border-radius:50%;background:#e23b2e}
+.inbox-thumb{width:46px;height:46px;border-radius:11px;object-fit:cover;flex-shrink:0;background:rgba(58,36,16,0.1);display:flex;align-items:center;justify-content:center;font-size:22px}
+.inbox-body{flex:1;min-width:0}
+.inbox-beer{font-size:12px;font-weight:800;color:#3a2410}
+.inbox-text{font-size:14px;color:#333;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.inbox-meta{font-size:11px;color:rgba(0,0,0,0.45);margin-top:2px}
+.inbox-empty{font-size:14px;color:rgba(58,36,16,0.7);font-weight:600;text-align:center;padding:40px 14px}
 .modal-info-row{display:flex;gap:0;border-radius:12px;overflow:hidden;background:rgba(58,36,16,0.06);flex-shrink:0}
 .modal-info-cell{flex:1;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 .modal-info-cell:not(:last-child){border-right:1px solid rgba(58,36,16,0.1)}
@@ -184,8 +208,10 @@ input[type=file]{display:none}
 .modal-btn-edit{padding:7px 16px;background:rgba(58,36,16,0.1);color:#3a2410;border:none;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer}
 .modal-btn-delete{padding:7px 16px;background:transparent;color:#c0392b;border:1px solid rgba(192,57,43,0.25);border-radius:20px;font-size:12px;font-weight:700;cursor:pointer}
 /* STATISTIKK */
-.home-stats-btn{width:54px;height:54px;border-radius:50%;cursor:pointer;align-self:center;margin-top:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(315deg,rgba(255,255,255,0.22),rgba(255,255,255,0.07));backdrop-filter:blur(2px) saturate(1.3);-webkit-backdrop-filter:blur(2px) saturate(1.3);border:1px solid rgba(255,255,255,0.45);box-shadow:inset 1px 1px 1px rgba(255,255,255,0.55),inset -1px -1px 2px rgba(255,255,255,0.15),0 5px 14px rgba(40,25,12,0.28)}
+.home-stats-btn{width:54px;height:54px;border-radius:50%;cursor:pointer;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(315deg,rgba(255,255,255,0.22),rgba(255,255,255,0.07));backdrop-filter:blur(2px) saturate(1.3);-webkit-backdrop-filter:blur(2px) saturate(1.3);border:1px solid rgba(255,255,255,0.45);box-shadow:inset 1px 1px 1px rgba(255,255,255,0.55),inset -1px -1px 2px rgba(255,255,255,0.15),0 5px 14px rgba(40,25,12,0.28)}
 .home-stats-btn svg{width:31px;height:31px}
+.home-circle-row{display:flex;gap:12px;align-self:center;margin-top:auto;flex-shrink:0;align-items:center;justify-content:center}
+.badge-dot{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:#e23b2e;border:2px solid rgba(255,250,243,0.95);box-shadow:0 1px 3px rgba(0,0,0,0.35);display:none}
 .stats-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px;flex:1;display:flex;flex-direction:column;gap:16px}
 #statsContent{display:flex;flex-direction:column;gap:16px}
 .stats-seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:rgba(58,36,16,0.08);border:1px solid rgba(255,255,255,0.4)}
@@ -289,7 +315,13 @@ input[type=file]{display:none}
   </div>
   <div class="home-right">
     <div class="home-collage" id="homeCollage"></div>
-    <button class="home-stats-btn" onclick="showStats()" title="Statistikk"><svg viewBox="0 0 24 24"><path d="M5 3.5 V18.5 H20.8" fill="none" stroke="#3a2410" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="7.3" y="12.5" width="2.7" height="6" rx="0.6" fill="#3a2410"/><rect x="10.8" y="9.5" width="2.7" height="9" rx="0.6" fill="#3a2410"/><rect x="14.3" y="11" width="2.7" height="7.5" rx="0.6" fill="#3a2410"/><rect x="17.8" y="6.5" width="2.7" height="12" rx="0.6" fill="#3a2410"/></svg></button>
+    <div class="home-circle-row">
+      <button class="home-stats-btn" onclick="showComments()" title="Kommentarer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3a2410" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="M3.5 6.5 L12 13 L20.5 6.5"/></svg>
+        <span class="badge-dot" id="commentsDot"></span>
+      </button>
+      <button class="home-stats-btn" onclick="showStats()" title="Statistikk"><svg viewBox="0 0 24 24"><path d="M5 3.5 V18.5 H20.8" fill="none" stroke="#3a2410" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="7.3" y="12.5" width="2.7" height="6" rx="0.6" fill="#3a2410"/><rect x="10.8" y="9.5" width="2.7" height="9" rx="0.6" fill="#3a2410"/><rect x="14.3" y="11" width="2.7" height="7.5" rx="0.6" fill="#3a2410"/><rect x="17.8" y="6.5" width="2.7" height="12" rx="0.6" fill="#3a2410"/></svg></button>
+    </div>
     <div class="home-toplist" id="homeToplist"></div>
   </div>
 </div>
@@ -422,6 +454,19 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<!-- KOMMENTARER (innboks) -->
+<div id="commentsScreen" class="overlay-screen">
+  <div class="overlay-panel glass">
+    <div class="overlay-header">
+      <button class="btn-back" onclick="goHome()">
+        <svg width="24" height="24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h2>Kommentarer</h2>
+    </div>
+    <div class="inbox-list" id="inboxList"></div>
+  </div>
+</div>
+
 <!-- DETAIL MODAL -->
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal-card">
@@ -442,6 +487,14 @@ input[type=file]{display:none}
         <div class="modal-info-cell"><div class="modal-info-label">Lagt til av</div><div class="modal-info-val" id="modalUser"></div></div>
       </div>
       <div class="modal-notes" id="modalNotes" style="display:none"></div>
+      <div class="modal-comments">
+        <div class="modal-comments-title">Kommentarer</div>
+        <div id="modalCommentList"></div>
+        <div class="comment-input-row">
+          <textarea id="modalCommentInput" rows="1" placeholder="Skriv en kommentar…" oninput="commentInputResize(this)"></textarea>
+          <button class="comment-send" id="modalCommentSend" onclick="sendComment()" title="Send"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+      </div>
     </div>
     <div class="modal-actions" id="modalActions">
       <button class="modal-btn-edit" id="modalEditBtn">Rediger</button>
@@ -475,11 +528,12 @@ if(db.enablePersistence){db.enablePersistence({synchronizeTabs:true}).catch(func
 
 // E-post -> visningsnavn. Kontoene opprettes i Firebase-konsollen.
 const ACCOUNTS={'marius@sharebeer.app':'Marius','peter@sharebeer.app':'Peter'};
-let currentUser=null,currentListUser=null,selectedRating=0,pendingImageB64=null,editingId=null;
+let currentUser=null,currentListUser=null,selectedRating=0,pendingImageB64=null,editingId=null,modalBeerId=null;
 let toplistAlkoholfri=false;
 let beersCache=[];
 let unsubscribeSync=null;
 let unsubscribeFact=null;
+let unsubscribeSeen=null,commentsSeenTs=0;
 const DAYS=['\u00f8ndag','mandag','tirsdag','onsdag','torsdag','fredag','l\u00f8rdag'];
 const MONTHS=['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
 const MONTHS_LONG=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
@@ -493,8 +547,20 @@ function startSync(){
     if(document.getElementById('listScreen').classList.contains('active'))renderList();
     if(document.getElementById('searchScreen').classList.contains('active'))doSearch();
     if(document.getElementById('statsScreen').classList.contains('active'))renderStats();
+    if(document.getElementById('commentsScreen').classList.contains('active'))renderInbox();
+    if(modalBeerId){var mb=null;for(var i=0;i<beersCache.length;i++){if(beersCache[i].id===modalBeerId){mb=beersCache[i];break}}if(mb)renderModalComments(mb);}
   },function(err){console.error('Sync error:',err)});
   loadWeeklyFact();
+  subscribeCommentsSeen();
+}
+function subscribeCommentsSeen(){
+  if(!db||!db.collection)return;
+  if(unsubscribeSeen){unsubscribeSeen();unsubscribeSeen=null;}
+  unsubscribeSeen=db.collection('meta').doc('commentsSeen').onSnapshot(function(doc){
+    var data=doc&&doc.exists?doc.data():null;
+    commentsSeenTs=(data&&currentUser&&data[currentUser])?data[currentUser]:0;
+    updateCommentsBadge();
+  },function(){/* midlertidig feil: behold forrige verdi */});
 }
 function loadWeeklyFact(){
   var card=document.getElementById('factCard');
@@ -544,7 +610,7 @@ function authErrorMessage(e){
 function setHome(){
   document.getElementById('homeScreen').classList.add('active');
   document.getElementById('homeScreen').classList.remove('push-left');
-  ['loginScreen','listScreen','addScreen','searchScreen','statsScreen'].forEach(function(s){
+  ['loginScreen','listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
     document.getElementById(s).classList.remove('active');
     if(document.getElementById(s).classList.contains('overlay-screen')){
       document.getElementById(s).style.transform='translateX(100%)';
@@ -582,7 +648,7 @@ function repaintGlass(){
 })();
 function showOverlay(id){
   document.getElementById('homeScreen').classList.add('active','push-left');
-  ['listScreen','addScreen','searchScreen','statsScreen'].forEach(function(s){
+  ['listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
     document.getElementById(s).classList.remove('active');
   });
   document.getElementById(id).classList.add('active');
@@ -590,7 +656,7 @@ function showOverlay(id){
 function goHome(){
   closeModal();
   document.getElementById('homeScreen').classList.remove('push-left');
-  ['listScreen','addScreen','searchScreen','statsScreen'].forEach(function(s){
+  ['listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
     document.getElementById(s).classList.remove('active');
   });
   refreshHome();
@@ -608,8 +674,10 @@ auth.onAuthStateChanged(function(user){
   }else{
     if(unsubscribeSync){unsubscribeSync();unsubscribeSync=null;}
     if(unsubscribeFact){unsubscribeFact();unsubscribeFact=null;}
+    if(unsubscribeSeen){unsubscribeSeen();unsubscribeSeen=null;}
+    commentsSeenTs=0;
     beersCache=[];currentUser=null;
-    ['homeScreen','listScreen','addScreen','searchScreen','statsScreen'].forEach(function(s){
+    ['homeScreen','listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
       document.getElementById(s).classList.remove('active','push-left');
     });
     document.getElementById('loginScreen').classList.add('active');
@@ -640,6 +708,7 @@ function doLogout(){
 /* ── Home ── */
 function refreshHome(){
   renderHomeExtras();
+  updateCommentsBadge();
   var beers=loadBeers();
   var dateEl=document.getElementById('newestDate'),timeEl=document.getElementById('newestTime'),whoEl=document.getElementById('newestWho');
   if(!beers.length){dateEl.textContent='';timeEl.textContent='';whoEl.textContent='Ingen \u00f8l lagt til enn\u00e5';return}
@@ -755,9 +824,13 @@ function openModal(id){
   document.getElementById('modalActions').style.display=isOwner?'':'none';
   document.getElementById('modalEditBtn').onclick=function(){closeModal();showEdit(id)};
   document.getElementById('modalDeleteBtn').onclick=function(){deleteBeer(id)};
+  modalBeerId=id;
+  document.getElementById('modalCommentInput').value='';
+  commentInputResize(document.getElementById('modalCommentInput'));
+  renderModalComments(b);
   document.getElementById('modalBackdrop').classList.add('open');
 }
-function closeModal(){document.getElementById('modalBackdrop').classList.remove('open')}
+function closeModal(){document.getElementById('modalBackdrop').classList.remove('open');modalBeerId=null;}
 document.getElementById('modalBackdrop').addEventListener('click',function(e){if(e.target===this)closeModal()});
 
 function deleteBeer(id){
@@ -768,6 +841,95 @@ function deleteBeer(id){
   db.collection('beers').doc(id).delete().then(function(){
     closeModal();showToast('Øl slettet');
   }).catch(function(e){showToast('Kunne ikke slette: '+e.message,'error')});
+}
+
+/* ── Kommentarer ── */
+function commentTime(ts){
+  var d=new Date(ts),now=new Date();
+  var sameDay=d.toDateString()===now.toDateString();
+  if(sameDay)return 'i dag '+pad(d.getHours())+':'+pad(d.getMinutes());
+  var y=new Date(now.getTime()-86400000);
+  if(d.toDateString()===y.toDateString())return 'i går '+pad(d.getHours())+':'+pad(d.getMinutes());
+  return d.getDate()+'. '+MONTHS[d.getMonth()]+' '+pad(d.getHours())+':'+pad(d.getMinutes());
+}
+function commentInputResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,110)+'px';}
+function renderModalComments(b){
+  var wrap=document.getElementById('modalCommentList');
+  var cs=(b.comments||[]).slice().sort(function(a,b){return (a.ts||0)-(b.ts||0);});
+  if(!cs.length){wrap.innerHTML='<div class="comment-empty">Ingen kommentarer ennå.</div>';return;}
+  wrap.innerHTML=cs.map(function(c){
+    return '<div class="comment"><div class="comment-head"><span class="comment-by">'+esc(c.by||'')+'</span>'+
+           '<span class="comment-when">'+esc(commentTime(c.ts||0))+'</span></div>'+
+           '<div class="comment-text">'+esc(c.text||'')+'</div></div>';
+  }).join('');
+}
+function sendComment(){
+  if(!modalBeerId)return;
+  var input=document.getElementById('modalCommentInput');
+  var text=input.value.trim();
+  if(!text)return;
+  var btn=document.getElementById('modalCommentSend');
+  btn.disabled=true;
+  var comment={by:currentUser,text:text,ts:Date.now()};
+  db.collection('beers').doc(modalBeerId).update({
+    comments:firebase.firestore.FieldValue.arrayUnion(comment)
+  }).then(function(){
+    input.value='';commentInputResize(input);
+    // Vis umiddelbart fra lokal cache (lytteren oppdaterer uansett straks)
+    var b=null,bs=loadBeers();
+    for(var i=0;i<bs.length;i++){if(bs[i].id===modalBeerId){b=bs[i];break}}
+    if(b){b.comments=(b.comments||[]).concat([comment]);renderModalComments(b);}
+  }).catch(function(e){showToast('Kunne ikke sende: '+e.message,'error');})
+    .then(function(){btn.disabled=false;});
+}
+
+/* ── Kommentar-varsel (brev-runding) ── */
+function unseenComments(){
+  var out=[];
+  loadBeers().forEach(function(b){
+    if(b.user!==currentUser)return;
+    (b.comments||[]).forEach(function(c){
+      if(c.by!==currentUser&&(c.ts||0)>commentsSeenTs)out.push({beer:b,comment:c});
+    });
+  });
+  return out;
+}
+function updateCommentsBadge(){
+  var dot=document.getElementById('commentsDot');
+  if(!dot)return;
+  dot.style.display=unseenComments().length?'block':'none';
+}
+function showComments(){
+  renderInbox();
+  showOverlay('commentsScreen');
+  // Marker som sett -> nullstiller prikken (synces på tvers av enheter)
+  if(db&&db.collection&&currentUser){
+    var patch={};patch[currentUser]=Date.now();
+    db.collection('meta').doc('commentsSeen').set(patch,{merge:true}).catch(function(){});
+  }
+}
+function renderInbox(){
+  var el=document.getElementById('inboxList');
+  var items=[];
+  loadBeers().forEach(function(b){
+    if(b.user!==currentUser)return;
+    (b.comments||[]).forEach(function(c){
+      if(c.by!==currentUser)items.push({beer:b,comment:c});
+    });
+  });
+  items.sort(function(a,b){return (b.comment.ts||0)-(a.comment.ts||0);});
+  if(!items.length){el.innerHTML='<div class="inbox-empty">Ingen kommentarer på ølene dine ennå.</div>';return;}
+  el.innerHTML=items.map(function(it){
+    var b=it.beer,c=it.comment,unread=(c.ts||0)>commentsSeenTs;
+    var thumb=b.image?'<img class="inbox-thumb" src="'+b.image+'" alt="">':'<div class="inbox-thumb">🍺</div>';
+    return '<div class="inbox-item'+(unread?' unread':'')+'" data-id="'+b.id+'">'+thumb+
+      '<div class="inbox-body"><div class="inbox-beer">'+esc(b.name)+'</div>'+
+      '<div class="inbox-text">'+esc(c.text||'')+'</div>'+
+      '<div class="inbox-meta">'+esc(c.by||'')+' · '+esc(commentTime(c.ts||0))+'</div></div></div>';
+  }).join('');
+  el.querySelectorAll('.inbox-item').forEach(function(row){
+    row.addEventListener('click',function(){openModal(this.dataset.id);});
+  });
 }
 
 /* ── Add / Edit ── */
