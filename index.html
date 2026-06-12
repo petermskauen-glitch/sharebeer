@@ -871,16 +871,14 @@ function sendComment(){
   var btn=document.getElementById('modalCommentSend');
   btn.disabled=true;
   var comment={by:currentUser,text:text,ts:Date.now()};
+  // Tøm feltet med en gang; sanntidslytteren viser kommentaren straks den er lagret.
+  input.value='';commentInputResize(input);
   db.collection('beers').doc(modalBeerId).update({
     comments:firebase.firestore.FieldValue.arrayUnion(comment)
-  }).then(function(){
-    input.value='';commentInputResize(input);
-    // Vis umiddelbart fra lokal cache (lytteren oppdaterer uansett straks)
-    var b=null,bs=loadBeers();
-    for(var i=0;i<bs.length;i++){if(bs[i].id===modalBeerId){b=bs[i];break}}
-    if(b){b.comments=(b.comments||[]).concat([comment]);renderModalComments(b);}
-  }).catch(function(e){showToast('Kunne ikke sende: '+e.message,'error');})
-    .then(function(){btn.disabled=false;});
+  }).catch(function(e){
+    showToast('Kunne ikke sende: '+e.message,'error');
+    input.value=text;commentInputResize(input);
+  }).then(function(){btn.disabled=false;});
 }
 
 /* ── Kommentar-varsel (brev-runding) ── */
