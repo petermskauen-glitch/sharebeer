@@ -211,7 +211,16 @@ input[type=file]{display:none}
 .home-stats-btn{width:54px;height:54px;border-radius:50%;cursor:pointer;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(315deg,rgba(255,255,255,0.22),rgba(255,255,255,0.07));backdrop-filter:blur(2px) saturate(1.3);-webkit-backdrop-filter:blur(2px) saturate(1.3);border:1px solid rgba(255,255,255,0.45);box-shadow:inset 1px 1px 1px rgba(255,255,255,0.55),inset -1px -1px 2px rgba(255,255,255,0.15),0 5px 14px rgba(40,25,12,0.28)}
 .home-stats-btn svg{width:31px;height:31px}
 .home-circle-row{display:flex;gap:12px;align-self:center;margin-top:auto;flex-shrink:0;align-items:center;justify-content:center}
+.home-circle-stack{display:flex;flex-direction:column;gap:12px;align-items:center}
 .badge-dot{position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:#e23b2e;border:2px solid rgba(255,250,243,0.95);box-shadow:0 1px 3px rgba(0,0,0,0.35);display:none}
+/* ── Ønskeliste ── */
+.modal-wish-btn{flex-shrink:0;width:38px;height:38px;border-radius:50%;border:none;background:rgba(58,36,16,0.08);cursor:pointer;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;transition:background .15s,transform .1s}
+.modal-wish-btn:active{transform:scale(0.9)}
+.modal-wish-btn svg{width:20px;height:20px;stroke:#3a2410;fill:none;stroke-width:1.7;stroke-linejoin:round}
+.modal-wish-btn.active{background:rgba(58,36,16,0.18)}
+.modal-wish-btn.active svg{fill:#3a2410}
+.wish-remove{flex-shrink:0;width:32px;height:32px;border-radius:50%;border:none;background:rgba(192,57,43,0.12);color:#c0392b;font-size:21px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 0 2px}
+.wish-remove:active{background:rgba(192,57,43,0.22)}
 .stats-body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px;flex:1;display:flex;flex-direction:column;gap:16px}
 #statsContent{display:flex;flex-direction:column;gap:16px}
 .stats-seg{display:flex;gap:4px;padding:4px;border-radius:14px;background:rgba(58,36,16,0.08);border:1px solid rgba(255,255,255,0.4)}
@@ -316,10 +325,15 @@ input[type=file]{display:none}
   <div class="home-right">
     <div class="home-collage" id="homeCollage"></div>
     <div class="home-circle-row">
-      <button class="home-stats-btn" onclick="showComments()" title="Kommentarer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#3a2410" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="M3.5 6.5 L12 13 L20.5 6.5"/></svg>
-        <span class="badge-dot" id="commentsDot"></span>
-      </button>
+      <div class="home-circle-stack">
+        <button class="home-stats-btn" onclick="showComments()" title="Kommentarer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#3a2410" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="M3.5 6.5 L12 13 L20.5 6.5"/></svg>
+          <span class="badge-dot" id="commentsDot"></span>
+        </button>
+        <button class="home-stats-btn" onclick="showWishlist()" title="Ønskeliste">
+          <svg viewBox="0 0 24 24"><path d="M6 3.5 h12 a1 1 0 0 1 1 1 v16.7 l-7 -3.9 -7 3.9 v-16.7 a1 1 0 0 1 1 -1 z" fill="none" stroke="#3a2410" stroke-width="1.5" stroke-linejoin="round"/><rect x="11.2" y="6.2" width="1.6" height="2.3" fill="#3a2410"/><rect x="10" y="8" width="4" height="6.4" rx="1.3" fill="#3a2410"/></svg>
+        </button>
+      </div>
       <button class="home-stats-btn" onclick="showStats()" title="Statistikk"><svg viewBox="0 0 24 24"><path d="M5 3.5 V18.5 H20.8" fill="none" stroke="#3a2410" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><rect x="7.3" y="12.5" width="2.7" height="6" rx="0.6" fill="#3a2410"/><rect x="10.8" y="9.5" width="2.7" height="9" rx="0.6" fill="#3a2410"/><rect x="14.3" y="11" width="2.7" height="7.5" rx="0.6" fill="#3a2410"/><rect x="17.8" y="6.5" width="2.7" height="12" rx="0.6" fill="#3a2410"/></svg></button>
     </div>
     <div class="home-toplist" id="homeToplist"></div>
@@ -467,6 +481,19 @@ input[type=file]{display:none}
   </div>
 </div>
 
+<!-- ØNSKELISTE -->
+<div id="wishlistScreen" class="overlay-screen">
+  <div class="overlay-panel glass">
+    <div class="overlay-header">
+      <button class="btn-back" onclick="goHome()">
+        <svg width="24" height="24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h2>Ønskeliste</h2>
+    </div>
+    <div class="inbox-list" id="wishList"></div>
+  </div>
+</div>
+
 <!-- DETAIL MODAL -->
 <div class="modal-backdrop" id="modalBackdrop">
   <div class="modal-card">
@@ -479,6 +506,9 @@ input[type=file]{display:none}
           <div class="modal-name" id="modalName"></div>
           <div class="modal-brewery" id="modalBrewery"></div>
         </div>
+        <button class="modal-wish-btn" id="modalWishBtn" onclick="toggleWishlist()" title="Legg i ønskeliste">
+          <svg viewBox="0 0 24 24"><path d="M6 3.5 h12 a1 1 0 0 1 1 1 v16.7 l-7 -3.9 -7 3.9 v-16.7 a1 1 0 0 1 1 -1 z"/><rect x="11.2" y="6.4" width="1.6" height="2.2" fill="#3a2410" stroke="none"/><rect x="10.1" y="8.1" width="3.8" height="6" rx="1.25" fill="#3a2410" stroke="none"/></svg>
+        </button>
       </div>
       <div class="modal-meta" id="modalMeta"></div>
       <div class="modal-info-row">
@@ -534,6 +564,7 @@ let beersCache=[];
 let unsubscribeSync=null;
 let unsubscribeFact=null;
 let unsubscribeSeen=null,commentsSeenTs=0;
+let unsubscribeWishlist=null,wishlistData={};
 const DAYS=['\u00f8ndag','mandag','tirsdag','onsdag','torsdag','fredag','l\u00f8rdag'];
 const MONTHS=['jan','feb','mar','apr','mai','jun','jul','aug','sep','okt','nov','des'];
 const MONTHS_LONG=['januar','februar','mars','april','mai','juni','juli','august','september','oktober','november','desember'];
@@ -548,10 +579,21 @@ function startSync(){
     if(document.getElementById('searchScreen').classList.contains('active'))doSearch();
     if(document.getElementById('statsScreen').classList.contains('active'))renderStats();
     if(document.getElementById('commentsScreen').classList.contains('active'))renderInbox();
+    if(document.getElementById('wishlistScreen').classList.contains('active'))renderWishlist();
     if(modalBeerId){var mb=null;for(var i=0;i<beersCache.length;i++){if(beersCache[i].id===modalBeerId){mb=beersCache[i];break}}if(mb)renderModalComments(mb);}
   },function(err){console.error('Sync error:',err)});
   loadWeeklyFact();
   subscribeCommentsSeen();
+  subscribeWishlist();
+}
+function subscribeWishlist(){
+  if(!db||!db.collection)return;
+  if(unsubscribeWishlist){unsubscribeWishlist();unsubscribeWishlist=null;}
+  unsubscribeWishlist=db.collection('meta').doc('wishlist').onSnapshot(function(doc){
+    wishlistData=(doc&&doc.exists?doc.data():null)||{};
+    updateModalWish();
+    if(document.getElementById('wishlistScreen').classList.contains('active'))renderWishlist();
+  },function(){/* midlertidig feil: behold forrige verdi */});
 }
 function subscribeCommentsSeen(){
   if(!db||!db.collection)return;
@@ -610,7 +652,7 @@ function authErrorMessage(e){
 function setHome(){
   document.getElementById('homeScreen').classList.add('active');
   document.getElementById('homeScreen').classList.remove('push-left');
-  ['loginScreen','listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
+  ['loginScreen','listScreen','addScreen','searchScreen','statsScreen','commentsScreen','wishlistScreen'].forEach(function(s){
     document.getElementById(s).classList.remove('active');
     if(document.getElementById(s).classList.contains('overlay-screen')){
       document.getElementById(s).style.transform='translateX(100%)';
@@ -648,7 +690,7 @@ function repaintGlass(){
 })();
 function showOverlay(id){
   document.getElementById('homeScreen').classList.add('active','push-left');
-  ['listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
+  ['listScreen','addScreen','searchScreen','statsScreen','commentsScreen','wishlistScreen'].forEach(function(s){
     document.getElementById(s).classList.remove('active');
   });
   document.getElementById(id).classList.add('active');
@@ -656,7 +698,7 @@ function showOverlay(id){
 function goHome(){
   closeModal();
   document.getElementById('homeScreen').classList.remove('push-left');
-  ['listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
+  ['listScreen','addScreen','searchScreen','statsScreen','commentsScreen','wishlistScreen'].forEach(function(s){
     document.getElementById(s).classList.remove('active');
   });
   refreshHome();
@@ -675,9 +717,10 @@ auth.onAuthStateChanged(function(user){
     if(unsubscribeSync){unsubscribeSync();unsubscribeSync=null;}
     if(unsubscribeFact){unsubscribeFact();unsubscribeFact=null;}
     if(unsubscribeSeen){unsubscribeSeen();unsubscribeSeen=null;}
-    commentsSeenTs=0;
+    if(unsubscribeWishlist){unsubscribeWishlist();unsubscribeWishlist=null;}
+    commentsSeenTs=0;wishlistData={};
     beersCache=[];currentUser=null;
-    ['homeScreen','listScreen','addScreen','searchScreen','statsScreen','commentsScreen'].forEach(function(s){
+    ['homeScreen','listScreen','addScreen','searchScreen','statsScreen','commentsScreen','wishlistScreen'].forEach(function(s){
       document.getElementById(s).classList.remove('active','push-left');
     });
     document.getElementById('loginScreen').classList.add('active');
@@ -825,6 +868,7 @@ function openModal(id){
   document.getElementById('modalEditBtn').onclick=function(){closeModal();showEdit(id)};
   document.getElementById('modalDeleteBtn').onclick=function(){deleteBeer(id)};
   modalBeerId=id;
+  updateModalWish();
   document.getElementById('modalCommentInput').value='';
   commentInputResize(document.getElementById('modalCommentInput'));
   renderModalComments(b);
@@ -925,6 +969,68 @@ function renderInbox(){
       '<div class="inbox-text">'+esc(c.text||'')+'</div>'+
       '<div class="inbox-meta">'+esc(c.by||'')+' · '+esc(commentTime(c.ts||0))+'</div></div></div>';
   }).join('');
+  el.querySelectorAll('.inbox-item').forEach(function(row){
+    row.addEventListener('click',function(){openModal(this.dataset.id);});
+  });
+}
+
+/* ── Ønskeliste ── */
+function wishlistIds(){
+  var v=currentUser?wishlistData[currentUser]:null;
+  return Array.isArray(v)?v:[];
+}
+function isWishlisted(id){return wishlistIds().indexOf(id)>=0;}
+function updateModalWish(){
+  var btn=document.getElementById('modalWishBtn');
+  if(!btn)return;
+  if(!modalBeerId){btn.classList.remove('active');return;}
+  var on=isWishlisted(modalBeerId);
+  btn.classList.toggle('active',on);
+  btn.title=on?'Fjern fra ønskeliste':'Legg i ønskeliste';
+}
+function toggleWishlist(){
+  if(!modalBeerId||!currentUser||!db||!db.collection)return;
+  var on=isWishlisted(modalBeerId);
+  // Oppdater knappen med en gang; sanntidslytteren bekrefter når det er lagret.
+  var btn=document.getElementById('modalWishBtn');
+  if(btn){btn.classList.toggle('active',!on);btn.title=!on?'Fjern fra ønskeliste':'Legg i ønskeliste';}
+  var FV=firebase.firestore.FieldValue;
+  var patch={};patch[currentUser]=on?FV.arrayRemove(modalBeerId):FV.arrayUnion(modalBeerId);
+  db.collection('meta').doc('wishlist').set(patch,{merge:true}).then(function(){
+    showToast(on?'Fjernet fra ønskeliste':'Lagt i ønskeliste');
+  }).catch(function(e){
+    if(btn){btn.classList.toggle('active',on);}
+    showToast('Kunne ikke lagre: '+e.message,'error');
+  });
+}
+function removeFromWishlist(id){
+  if(!currentUser||!db||!db.collection)return;
+  var patch={};patch[currentUser]=firebase.firestore.FieldValue.arrayRemove(id);
+  db.collection('meta').doc('wishlist').set(patch,{merge:true}).then(function(){
+    showToast('Fjernet fra ønskeliste');
+  }).catch(function(e){showToast('Kunne ikke fjerne: '+e.message,'error')});
+}
+function showWishlist(){renderWishlist();showOverlay('wishlistScreen');}
+function renderWishlist(){
+  var el=document.getElementById('wishList');
+  if(!el)return;
+  var ids=wishlistIds(),beers=loadBeers();
+  var items=[];
+  ids.forEach(function(id){
+    for(var i=0;i<beers.length;i++){if(beers[i].id===id){items.push(beers[i]);break;}}
+  });
+  if(!items.length){el.innerHTML='<div class="inbox-empty">Ønskelisten din er tom. Trykk på bokmerket inne på en øl for å legge den til.</div>';return;}
+  el.innerHTML=items.map(function(b){
+    var thumb=b.image?'<img class="inbox-thumb" src="'+b.image+'" alt="">':'<div class="inbox-thumb">🍺</div>';
+    return '<div class="inbox-item" data-id="'+b.id+'">'+thumb+
+      '<div class="inbox-body"><div class="inbox-beer">'+esc(b.name)+'</div>'+
+      '<div class="inbox-text">'+esc(b.brewery||'')+'</div>'+
+      '<div class="inbox-meta">Lagt til av '+esc(b.user||'')+'</div></div>'+
+      '<button class="wish-remove" data-remove="'+b.id+'" title="Fjern fra ønskeliste">&times;</button></div>';
+  }).join('');
+  el.querySelectorAll('.wish-remove').forEach(function(btn){
+    btn.addEventListener('click',function(e){e.stopPropagation();removeFromWishlist(this.dataset.remove);});
+  });
   el.querySelectorAll('.inbox-item').forEach(function(row){
     row.addEventListener('click',function(){openModal(this.dataset.id);});
   });
