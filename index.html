@@ -1214,7 +1214,11 @@ function saveBeer(){
     beerData.image=imageData||null;
     if(editingId){
       beerData.id=editingId;
-      beerData.user=loadBeers().filter(function(b){return b.id===editingId})[0].user;
+      var existing=loadBeers().filter(function(b){return b.id===editingId})[0]||{};
+      beerData.user=existing.user;
+      // Bevar kommentarene: .set() overskriver hele dokumentet, så uten dette
+      // ville redigering av en øl slette alle kommentarer på den.
+      if(existing.comments)beerData.comments=existing.comments;
       db.collection('beers').doc(editingId).set(beerData).then(function(){
         currentListUser=beerData.user;
         document.getElementById('listTitle').textContent=beerData.user+'s \u00f8l';
