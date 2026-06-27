@@ -558,6 +558,10 @@ if(db.enablePersistence){db.enablePersistence({synchronizeTabs:true}).catch(func
 
 // E-post -> visningsnavn. Kontoene opprettes i Firebase-konsollen.
 const ACCOUNTS={'marius@sharebeer.app':'Marius','peter@sharebeer.app':'Peter'};
+// Moderator kan slette hvilken som helst øl (også andres). Redigering er fortsatt
+// kun for eieren selv.
+const MODERATOR='Peter';
+function isModerator(){return currentUser===MODERATOR;}
 let currentUser=null,currentListUser=null,selectedRating=0,pendingImageB64=null,editingId=null,modalBeerId=null;
 let toplistAlkoholfri=false;
 let beersCache=[];
@@ -866,8 +870,10 @@ function openModal(id){
   document.getElementById('modalDate').textContent=DAYS[d.getDay()]+' '+d.getDate()+'. '+MONTHS_LONG[d.getMonth()]+' '+d.getFullYear();
   document.getElementById('modalTime').textContent=pad(d.getHours())+':'+pad(d.getMinutes());
   document.getElementById('modalUser').textContent=b.user;
-  var isOwner=(b.user===currentUser);
-  document.getElementById('modalActions').style.display=isOwner?'':'none';
+  var isOwner=(b.user===currentUser),canDelete=isOwner||isModerator();
+  document.getElementById('modalActions').style.display=(isOwner||canDelete)?'':'none';
+  document.getElementById('modalEditBtn').style.display=isOwner?'':'none';
+  document.getElementById('modalDeleteBtn').style.display=canDelete?'':'none';
   document.getElementById('modalEditBtn').onclick=function(){closeModal();showEdit(id)};
   document.getElementById('modalDeleteBtn').onclick=function(){deleteBeer(id)};
   modalBeerId=id;
@@ -883,8 +889,13 @@ document.getElementById('modalBackdrop').addEventListener('click',function(e){if
 function deleteBeer(id){
   var bs=loadBeers(),target=null;
   for(var i=0;i<bs.length;i++){if(bs[i].id===id){target=bs[i];break}}
-  if(target&&target.user!==currentUser){showToast('Du kan bare slette din egen \u00f8l','error');return;}
-  if(!confirm('Vil du slette dette \u00f8let?'))return;
+  var someoneElse=target&&target.user!==currentUser;
+  if(someoneElse&&!isModerator()){showToast('Du kan bare slette din egen \u00f8l','error');return;}
+  // Moderator som sletter en annens \u00f8l f\u00e5r en tydeligere bekreftelse.
+  var q=someoneElse
+    ? 'Slette '+target.user+' sin \u00f8l \u00ab'+(target.name||'')+'\u00bb? (moderator)'
+    : 'Vil du slette dette \u00f8let?';
+  if(!confirm(q))return;
   db.collection('beers').doc(id).delete().then(function(){
     closeModal();showToast('Øl slettet');
   }).catch(function(e){showToast('Kunne ikke slette: '+e.message,'error')});
