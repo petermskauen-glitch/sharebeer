@@ -404,7 +404,7 @@ input[type=file]{display:none}
       <div class="field"><label>Kjøpt på</label><input type="text" id="f_purchased" placeholder="f.eks. Vinmonopolet, Meny…"></div>
       <div class="field"><label>Dato og tid</label><input type="datetime-local" id="f_datetime"></div>
       <div class="field"><label>Notater</label><textarea id="f_notes" placeholder="Smak, aroma, inntrykk…"></textarea></div>
-      <button class="btn-save" onclick="saveBeer()"><span id="saveLabel">Lagre øl 🍺</span></button>
+      <button class="btn-save" id="saveBtn" onclick="saveBeer()"><span id="saveLabel">Lagre øl 🍺</span></button>
     </div>
   </div>
 </div>
@@ -634,6 +634,9 @@ function compressImage(dataUrl,cb){
     c.getContext('2d').drawImage(img,0,0,w,h);
     cb(c.toDataURL('image/jpeg',0.65));
   };
+  // Faller tilbake til originalen hvis bildet ikke kan lastes – ellers ville
+  // callbacken (og dermed lagre-sperren) henge for alltid.
+  img.onerror=function(){cb(dataUrl);};
   img.src=dataUrl;
 }
 
@@ -1196,10 +1199,18 @@ function setRating(r){
   selectedRating=r;
   document.querySelectorAll('.rating-btn').forEach(function(b){b.classList.toggle('selected',parseInt(b.dataset.r)<=r)});
 }
+var savingBeer=false;
 function saveBeer(){
   var name=document.getElementById('f_name').value.trim();
   var brewery=document.getElementById('f_brewery').value.trim();
   if(!name){alert('Navn er p\u00e5krevd.');return}
+  // Sperre mot dobbeltlagring: gjentatte trykk mens en lagring p\u00e5g\u00e5r ignoreres.
+  // (Tidligere kunne treg/offline linje gi flere duplikater av samme \u00f8l.)
+  if(savingBeer)return;
+  savingBeer=true;
+  var saveBtn=document.getElementById('saveBtn');
+  if(saveBtn)saveBtn.disabled=true;
+  function finishSaving(){savingBeer=false;if(saveBtn)saveBtn.disabled=false;}
   var beerData={
     name:name,brewery:brewery,
     style:getSelectedStyle(),
@@ -1212,6 +1223,9 @@ function saveBeer(){
   };
   function doSave(imageData){
     beerData.image=imageData||null;
+    // Naviger og gi tilbakemelding med en gang skrivingen er sendt – vent IKKE på
+    // server-bekreftelse. Offline/treg linje lot tidligere skjermen stå, så brukeren
+    // trykket på nytt og fikk duplikater. Sanntidslytteren viser ølet uansett.
     if(editingId){
       beerData.id=editingId;
       var existing=loadBeers().filter(function(b){return b.id===editingId})[0]||{};
@@ -1219,18 +1233,17 @@ function saveBeer(){
       // Bevar kommentarene: .set() overskriver hele dokumentet, så uten dette
       // ville redigering av en øl slette alle kommentarer på den.
       if(existing.comments)beerData.comments=existing.comments;
-      db.collection('beers').doc(editingId).set(beerData).then(function(){
-        currentListUser=beerData.user;
-        document.getElementById('listTitle').textContent=beerData.user+'s \u00f8l';
-        renderList();showOverlay('listScreen');showToast('Endringer lagret');
-      }).catch(function(e){showToast('Kunne ikke lagre: '+e.message,'error')});
+      db.collection('beers').doc(editingId).set(beerData).catch(function(e){showToast('Kunne ikke lagre: '+e.message,'error')});
+      currentListUser=beerData.user;
+      document.getElementById('listTitle').textContent=beerData.user+'s \u00f8l';
+      renderList();showOverlay('listScreen');showToast('Endringer lagret');
     }else{
       beerData.id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
       beerData.user=currentUser;
-      db.collection('beers').doc(beerData.id).set(beerData).then(function(){
-        goHome();showToast('Øl lagret 🍺');
-      }).catch(function(e){showToast('Kunne ikke lagre: '+e.message,'error')});
+      db.collection('beers').doc(beerData.id).set(beerData).catch(function(e){showToast('Kunne ikke lagre: '+e.message,'error')});
+      goHome();showToast('Øl lagret 🍺');
     }
+    finishSaving();
   }
   if(pendingImageB64&&pendingImageB64.length>200000){
     compressImage(pendingImageB64,doSave);
